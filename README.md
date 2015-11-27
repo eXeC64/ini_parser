@@ -25,7 +25,8 @@ fclose(f);
 
 ##Installation
 
-Just include `ini_parser.c` and `ini_parser.h` in your project.
+Just include `ini_parser.c` and `ini_parser.h` in your project. The only
+dependency is the standard C library.
 
 ##License
 

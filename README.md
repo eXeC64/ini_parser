@@ -23,6 +23,12 @@ do {
 fclose(f);
 ```
 
+##Tests
+
+This parser is covered by a comprehensive set of unit tests.
+
+Run `make check` to compile and run the test suite.
+
 ##Installation
 
 Just include `ini_parser.c` and `ini_parser.h` in your project. The only

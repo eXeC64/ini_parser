@@ -22,9 +22,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 #include <stdlib.h>
 #include <string.h>
 
-const int INI_VALUE   = 1;
-const int INI_SECTION = 2;
-
 enum parse_state {
   START,
   READING_KEY,
@@ -66,16 +63,17 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
   int type = 0;
   enum parse_state state = START;
   char quote = 0;
+  char c = 0;
 
-  while(*str != 0 && state != REJECT) {
-    char c = *str;
+  do {
+    c = *str;
     switch(state) {
       case START:
         if(c == '[') {
-          type = HM_INI_SECTION;
+          type = INI_SECTION;
           state = READING_SECTION_KEY;
         } else if(c != '=') {
-          type = HM_INI_VALUE;
+          type = INI_VALUE;
           state = READING_KEY;
           key_start = str;
           ++key_len;
@@ -117,6 +115,8 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
         if(quote == 0 && isspace(c)) {
           state = ACCEPT;
         } else if(quote && c == quote) {
+          state = ACCEPT;
+        } else if(c == 0) {
           state = ACCEPT;
         } else if(c) {
           if(!value_start) {
@@ -173,7 +173,7 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
         }
         break;
       case ACCEPT:
-        if(!isspace(c)) {
+        if(c != 0 && !isspace(c)) {
           state = REJECT;
         }
         break;
@@ -182,7 +182,7 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
         break;
     }
     ++str;
-  }
+  } while(c != 0 && state != REJECT);
 
   if(state == ACCEPT) {
     if(key_len >= key_size) {

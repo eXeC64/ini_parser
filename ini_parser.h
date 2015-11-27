@@ -22,8 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 
 #include <stdio.h>
 
-extern const int INI_SECTION;
-extern const int INI_VALUE;
+#define INI_VALUE 1
+#define INI_SECTION 2
 
 int parse_ini_file(FILE* f, char *out_key, size_t key_size, char *out_value, size_t value_size);
 int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_value, size_t value_size);

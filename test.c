@@ -8,8 +8,10 @@ const char *type_to_str(int type)
     return "INI_SECTION";
   } else if(type == INI_VALUE) {
     return "INI_VALUE";
+  } else if(type == INI_UNKNOWN) {
+    return "INI_UNKNOWN";
   } else {
-    return "UNKNOWN";
+    return "INVALID VALUE";
   }
 }
 
@@ -18,7 +20,6 @@ int test_line(int i, const char *str, int exp_type, const char *exp_key, const c
   char key[512];
   char value[512];
   int type = parse_ini_str(str, &key[0], sizeof key, &value[0], sizeof value);
-  /* printf("k,v = %s,%s\n", key, value); */
 
   int failed = 0;
   failed |= type != exp_type;
@@ -27,7 +28,7 @@ int test_line(int i, const char *str, int exp_type, const char *exp_key, const c
 
   if(failed) {
     fprintf(stderr,
-      "TEST %i FAILED: '%s'\n"
+      "TEST %i FAILED: |%s|\n"
       "\tExpected:\n"
       "\t\t TYPE: %s\n"
       "\t\t  KEY: '%s'\n"
@@ -56,6 +57,7 @@ struct test_case {
 };
 
 struct test_case tests[] = {
+  /* test basic key value pairs */
   {"key=value", INI_VALUE, "key", "value"},
   {"key= value", INI_VALUE, "key", "value"},
   {"key =value", INI_VALUE, "key", "value"},
@@ -64,6 +66,28 @@ struct test_case tests[] = {
   {"key = \"value\"", INI_VALUE, "key", "value"},
   {"key='value'", INI_VALUE, "key", "value"},
   {"key=\"value\"", INI_VALUE, "key", "value"},
+  {"a=\"some long value\"", INI_VALUE, "a", "some long value"},
+  {"b=\"weird'quote\"", INI_VALUE, "b", "weird'quote"},
+  {"c='weird\"quote'", INI_VALUE, "c", "weird\"quote"},
+  {"a=b=c", INI_VALUE, "a", "b=c"},
+
+  /* test sections */
+  {"[SectionName]", INI_SECTION, "SectionName", ""},
+  {"[User 'test']", INI_SECTION, "User", "test"},
+  {"[Section \"test\"]", INI_SECTION, "Section", "test"},
+
+  /* test comments */
+  {"; a = b", INI_UNKNOWN, "", ""},
+  {"; [section]", INI_UNKNOWN, "", ""},
+  {" ; c = d", INI_UNKNOWN, "", ""},
+  {" ; [sect]", INI_UNKNOWN, "", ""},
+
+  /* test some invalid input is rejected */
+  {"===--=-", INI_UNKNOWN, "", ""},
+  {"=a=c", INI_UNKNOWN, "", ""},
+  {"b='=''3", INI_UNKNOWN, "", ""},
+  {"", INI_UNKNOWN, "", ""},
+
   {NULL, NULL, NULL, NULL}
 };
 
@@ -83,5 +107,5 @@ int main()
   fprintf(stdout, "%i tests run\n%i tests passed\n%i tests failed\n",
     passed+failed, passed, failed);
 
-  return failed == 0;
+  return failed != 0;
 }

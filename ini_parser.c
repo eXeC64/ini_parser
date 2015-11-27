@@ -52,7 +52,9 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
 {
   /* ignore comments */
   if(*str == ';') {
-    return 0;
+    out_key[0] = 0;
+    out_value[0] = 0;
+    return INI_UNKNOWN;
   }
 
   const char *key_start = 0;
@@ -60,7 +62,7 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
   const char *value_start = 0;
   size_t value_len = 0;
 
-  int type = 0;
+  int type = INI_UNKNOWN;
   enum parse_state state = START;
   char quote = 0;
   char c = 0;
@@ -196,7 +198,10 @@ int parse_ini_str(const char* str, char *out_key, size_t key_size, char *out_val
     out_key[key_len] = 0;
     out_value[value_len] = 0;
     return type;
+  } else {
+    out_key[0] = 0;
+    out_value[0] = 0;
   }
 
-  return 0;
+  return INI_UNKNOWN;
 }

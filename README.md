@@ -1,7 +1,7 @@
 INI Parser
 ==========
 
-##Usage
+## Usage
 
 ```c
 FILE *f = fopen("config.ini", "r");
@@ -23,18 +23,18 @@ do {
 fclose(f);
 ```
 
-##Tests
+## Tests
 
 This parser is covered by a comprehensive set of unit tests.
 
 Run `make check` to compile and run the test suite.
 
-##Installation
+## Installation
 
 Just include `ini_parser.c` and `ini_parser.h` in your project. The only
 dependency is the standard C library.
 
-##License
+## License
 
 Copyright (c) 2015 Harry Jeffery
 
